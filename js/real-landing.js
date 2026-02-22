@@ -1,60 +1,58 @@
 (function () {
-  const projects = typeof pinnedProjects !== 'undefined' ? pinnedProjects : [];
+  const pinned = typeof pinnedProjects !== 'undefined' ? pinnedProjects : [];
+  const real = typeof projectRealContent !== 'undefined' ? projectRealContent : [];
   const styleMap = typeof styleProjectMap !== 'undefined' ? styleProjectMap : [];
   const styles = typeof stylesData !== 'undefined' ? stylesData : [];
 
-  if (!projects.length || !styleMap.length || !styles.length) return;
+  if (!real.length || !styleMap.length || !styles.length) return;
 
   const styleById = new Map(styles.map(s => [String(s.id), s]));
+  const realBySlug = new Map(real.map(p => [p.slug, p]));
 
-  const projectProfiles = {
-    meetingai: {
-      tagline: '把会议录音直接转成可执行纪要与行动项。',
-      audience: '团队协作 / 管理者 / 远程会议场景',
-      objective: '缩短“开会→对齐→执行”链路，减少遗漏。',
-      highlights: ['AI 实时转写', '结构化会议摘要', '任务项自动提取']
-    },
-    video2note: {
-      tagline: '把长视频快速拆解成图文教程与关键时间点。',
-      audience: '内容团队 / 运营 / 培训与教育',
-      objective: '把知识型视频转成可复用文档资产。',
-      highlights: ['字幕解析与打点', '关键帧自动截取', '图文教程一键生成']
-    },
-    carbo: {
-      tagline: '面向创作者的 Markdown 写作与发布工作台。',
-      audience: '开发者 / 写作者 / 内容创作团队',
-      objective: '提升写作流畅度与最终发布质量。',
-      highlights: ['结构化编辑', '可读性优先排版', '发布前内容校验']
-    },
-    framist: {
-      tagline: '创意工作流中可组合的自动化与素材处理能力。',
-      audience: '设计师 / 创意团队 / 实验型产品',
-      objective: '把重复设计工作自动化，聚焦创意输出。',
-      highlights: ['流程自动化', '素材预处理', '原型快速迭代']
-    },
-    typefree: {
-      tagline: '轻量、专注、高效率的输入与内容处理体验。',
-      audience: '高频输入用户 / 轻量工具用户',
-      objective: '降低输入阻力，强化专注体验。',
-      highlights: ['极简交互', '低认知负担', '高响应效率']
-    },
-    'cyber-gu': {
-      tagline: '赛博美学驱动的实验性互动产品。',
-      audience: '年轻用户 / 亚文化社区 / 视觉实验项目',
-      objective: '打造高辨识度品牌气质与沉浸式互动。',
-      highlights: ['赛博视觉语言', '世界观表达', '高记忆点交互']
+  // 保持与 pinned 顺序一致；若缺失则补到后面
+  const orderedProjects = [];
+  const used = new Set();
+  pinned.forEach(p => {
+    const rp = realBySlug.get(p.slug);
+    if (rp) {
+      orderedProjects.push({ ...p, ...rp });
+      used.add(p.slug);
     }
-  };
+  });
+  real.forEach(rp => {
+    if (!used.has(rp.slug)) orderedProjects.push(rp);
+  });
 
-  function getPrimaryStyles(projectSlug, limit = 2) {
+  function formatDate(iso) {
+    if (!iso) return '未知';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function statusText(status) {
+    if (status === 'active') return '持续活跃';
+    if (status === 'stable') return '稳定维护';
+    if (status === 'maintenance') return '维护模式';
+    return '状态未知';
+  }
+
+  function getPrimaryStyles(projectSlug, limit = 3) {
     const ids = [];
     styleMap.forEach(item => {
       if (item.primaryProject?.slug === projectSlug && !ids.includes(item.styleId)) {
         ids.push(item.styleId);
       }
     });
-
     return ids.slice(0, limit).map(id => styleById.get(String(id))).filter(Boolean);
+  }
+
+  function getRelatedStyleMap(projectSlug) {
+    return (
+      styleMap.find(m => m.primaryProject?.slug === projectSlug) ||
+      styleMap.find(m => m.secondaryProject?.slug === projectSlug) ||
+      null
+    );
   }
 
   function styleLinkChip(style) {
@@ -72,14 +70,16 @@
     const el = document.getElementById('hero-metrics');
     if (!el) return;
 
-    const langCount = new Set(projects.map(p => p.primaryLanguage).filter(Boolean)).size;
-    const totalRecommendations = styleMap.length;
+    const totalStars = orderedProjects.reduce((acc, p) => acc + (p.stars || 0), 0);
+    const langCount = new Set(
+      orderedProjects.flatMap(p => (p.techStack || []).slice(0, 3)).filter(Boolean)
+    ).size;
 
     el.innerHTML = `
-      <div class="metric-card"><strong>${projects.length}</strong><span>真实项目</span></div>
-      <div class="metric-card"><strong>${styles.length}</strong><span>可用风格策略</span></div>
-      <div class="metric-card"><strong>${totalRecommendations}</strong><span>项目-风格映射</span></div>
-      <div class="metric-card"><strong>${langCount}</strong><span>技术栈语言</span></div>
+      <div class="metric-card"><strong>${orderedProjects.length}</strong><span>真实项目（来自 GitHub）</span></div>
+      <div class="metric-card"><strong>${totalStars}</strong><span>累计 Stars</span></div>
+      <div class="metric-card"><strong>${styles.length}</strong><span>可适配设计风格</span></div>
+      <div class="metric-card"><strong>${langCount}</strong><span>覆盖技术栈</span></div>
     `;
   }
 
@@ -87,21 +87,13 @@
     const grid = document.getElementById('project-grid');
     if (!grid) return;
 
-    grid.innerHTML = projects
+    grid.innerHTML = orderedProjects
       .map(project => {
-        const profile = projectProfiles[project.slug] || {
-          tagline: project.positioning || '',
-          audience: '项目目标用户',
-          objective: '项目价值目标',
-          highlights: project.scenarios || []
-        };
-
-        const styleChips = getPrimaryStyles(project.slug, 3)
-          .map(styleLinkChip)
-          .join('');
-
-        const highlights = (profile.highlights || [])
-          .map(item => `<li>${item}</li>`)
+        const topStyles = getPrimaryStyles(project.slug, 3).map(styleLinkChip).join('');
+        const features = (project.features || []).slice(0, 4).map(f => `<li>${f}</li>`).join('');
+        const stack = (project.techStack || [])
+          .slice(0, 4)
+          .map(t => `<span class="project-tech-chip">${t}</span>`)
           .join('');
 
         return `
@@ -110,11 +102,17 @@
               <h3>${project.name}</h3>
               <a href="${project.url}" target="_blank" rel="noopener noreferrer">${project.repo} ↗</a>
             </div>
-            <p class="project-tagline">${profile.tagline}</p>
-            <p class="project-detail"><strong>目标用户：</strong>${profile.audience}</p>
-            <p class="project-detail"><strong>业务目标：</strong>${profile.objective}</p>
-            <ul class="project-list">${highlights}</ul>
-            <div class="project-style-links">${styleChips}</div>
+
+            <p class="project-tagline">${project.summary || project.description || '暂无项目摘要'}</p>
+            <p class="project-detail"><strong>项目描述：</strong>${project.description || '（仓库未填写描述）'}</p>
+            <p class="project-detail"><strong>状态：</strong>${statusText(project.status)} · 最近更新 ${formatDate(project.updatedAt)}</p>
+            <p class="project-detail"><strong>数据：</strong>⭐ ${project.stars || 0} · Fork ${project.forks || 0}</p>
+
+            <div class="project-tech-row">${stack}</div>
+
+            <ul class="project-list">${features}</ul>
+
+            <div class="project-style-links">${topStyles}</div>
           </article>
         `;
       })
@@ -127,11 +125,9 @@
 
     const cards = [];
 
-    projects.forEach(project => {
+    orderedProjects.forEach(project => {
       const topStyles = getPrimaryStyles(project.slug, 2);
-      topStyles.forEach(style => {
-        cards.push({ project, style });
-      });
+      topStyles.forEach(style => cards.push({ project, style }));
     });
 
     grid.innerHTML = cards
@@ -143,10 +139,10 @@
             <img src="${img}" alt="${project.name} - ${style.category}" />
             <div class="case-body">
               <h3 class="case-title">${project.name} × ${style.category}</h3>
-              <p class="case-meta">${project.positioning || ''}</p>
+              <p class="case-meta">${project.summary || project.description || ''}</p>
               <div class="case-links">
                 <a href="${project.url}" target="_blank" rel="noopener noreferrer">项目仓库</a>
-                <a href="${style.preview_url}" target="_blank" rel="noopener noreferrer">风格案例</a>
+                <a href="${style.preview_url}" target="_blank" rel="noopener noreferrer">对应落地风格</a>
               </div>
             </div>
           </article>
@@ -159,16 +155,17 @@
     const grid = document.getElementById('execution-grid');
     if (!grid) return;
 
-    // 按项目提取一条最关键的 checklist，形成可执行任务
-    const cards = projects.map(project => {
-      const related = styleMap.find(m => m.primaryProject?.slug === project.slug) || styleMap.find(m => m.secondaryProject?.slug === project.slug);
-      const checklist = related?.optimizationChecklist || [];
-      const top = checklist.slice(0, 4).map(item => `<li>${item}</li>`).join('');
+    const cards = orderedProjects.map(project => {
+      const related = getRelatedStyleMap(project.slug);
+      const checklist = (related?.optimizationChecklist || []).slice(0, 3);
+      const productTasks = (project.features || []).slice(0, 3).map(f => `把「${f}」转成页面可视化模块`);
+      const all = [...productTasks, ...checklist].slice(0, 6);
+      const list = all.map(item => `<li>${item}</li>`).join('');
 
       return `
         <article class="exec-card">
-          <h3>${project.name} · 页面改版优先项</h3>
-          <ul>${top}</ul>
+          <h3>${project.name} · 实际落地任务</h3>
+          <ul>${list}</ul>
         </article>
       `;
     });

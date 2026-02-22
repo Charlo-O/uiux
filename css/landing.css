@@ -244,6 +244,23 @@ body.landing-page {
   line-height: 1.45;
 }
 
+.project-tech-row {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.project-tech-chip {
+  display: inline-block;
+  font-size: 0.76rem;
+  color: #cde0ff;
+  background: rgba(124, 154, 255, 0.14);
+  border: 1px solid rgba(130, 160, 255, 0.35);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .project-list {
   margin: 10px 0 0;
   padding-left: 18px;
