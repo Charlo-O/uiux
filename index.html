@@ -1,62 +1,88 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI/UX Skill Pro Max - 設計資源中心</title>
-    <link rel="stylesheet" href="css/main.css">
-    <style>
-        .hero-section {
-            text-align: center;
-            margin-top: 4rem;
-        }
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AionUI · AI 项目矩阵落地页</title>
+  <meta name="description" content="基于真实项目打造的 AI 产品矩阵落地页：MeetingAI、Video2Note、Carbo、Framist、typefree、Cyber-Gu。" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/landing.css" />
 </head>
-<body>
-    <div class="hero-section">
-        <h1 class="hero-title">UI/UX Skill Pro Max</h1>
-        <p class="subtitle">全方位的現代化設計資源圖書館，提升您的設計工作流。</p>
+<body class="landing-page">
+  <header class="lp-nav">
+    <div class="lp-nav-inner">
+      <a class="lp-brand" href="#top">AionUI</a>
+      <nav class="lp-menu">
+        <a href="#products">项目矩阵</a>
+        <a href="#cases">落地案例</a>
+        <a href="#execution">执行方案</a>
+      </nav>
+      <a class="lp-nav-cta" href="https://github.com/Charlo-O/uiux" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
+  </header>
 
-    <div class="landing-grid">
-        <a href="uiuxpro_styles.html" class="landing-card">
-            <div class="landing-icon">🎨</div>
-            <div class="landing-title">風格庫 (Style Library)</div>
-            <div class="landing-desc">58+ 種現代 UI/UX 設計風格、應用場景與實作指南。</div>
-        </a>
-
-        <a href="uiuxpro_colors.html" class="landing-card">
-            <div class="landing-icon">🌈</div>
-            <div class="landing-title">配色庫 (Color Palettes)</div>
-            <div class="landing-desc">96+ 組針對不同產業類型的專業配色方案。</div>
-        </a>
-
-        <a href="uiuxpro_icons.html" class="landing-card">
-            <div class="landing-icon">✨</div>
-            <div class="landing-title">圖示庫 (Icon Set)</div>
-            <div class="landing-desc">基於 Lucide React 的精選圖示集合最佳實踐。</div>
-        </a>
-    </div>
-
-    <section class="project-context-home" id="project-context-home">
-        <div class="home-section-head">
-            <h2>Pinned Projects × UIUX Pro Max</h2>
-            <p>以下内容根据你 GitHub 主页置顶项目自动匹配：每个项目都给出建议风格方向，方便直接落地改版。</p>
+  <main>
+    <section id="top" class="lp-hero">
+      <div class="lp-hero-inner">
+        <p class="lp-badge">AIONUI PRODUCT SUITE</p>
+        <h1>不是 UI 风格展示站，<br />而是可直接上线的真实项目落地页。</h1>
+        <p class="lp-hero-desc">
+          把你的 GitHub 置顶项目（MeetingAI、Video2Note、Carbo、Framist、typefree、Cyber-Gu）
+          统一到一套可执行的产品叙事、视觉系统与转化路径里。
+        </p>
+        <div class="lp-hero-actions">
+          <a class="btn btn-primary" href="#products">查看项目矩阵</a>
+          <a class="btn btn-ghost" href="#execution">查看执行清单</a>
         </div>
-        <div class="home-project-grid" id="home-project-grid"></div>
+        <div id="hero-metrics" class="lp-metrics"></div>
+      </div>
     </section>
 
-    <script src="js/pinned-projects-data.js"></script>
-    <script src="js/style-project-map.js"></script>
-    <script src="js/style-data.js"></script>
-    <script src="js/index-projects.js"></script>
+    <section id="products" class="lp-section">
+      <div class="lp-section-head">
+        <h2>真实项目矩阵（Project Portfolio）</h2>
+        <p>每个项目都给出：定位、目标用户、核心能力、推荐风格、落地入口。</p>
+      </div>
+      <div id="project-grid" class="project-grid"></div>
+    </section>
+
+    <section id="cases" class="lp-section lp-section-dark">
+      <div class="lp-section-head">
+        <h2>项目 × 风格落地案例</h2>
+        <p>从 58 套风格里只保留最匹配你真实业务的案例，不再做孤立展示。</p>
+      </div>
+      <div id="case-grid" class="case-grid"></div>
+    </section>
+
+    <section id="execution" class="lp-section">
+      <div class="lp-section-head">
+        <h2>执行方案（Execution Plan）</h2>
+        <p>把风格、内容、转化整合为可交付页面结构，直接进入开发。</p>
+      </div>
+      <div id="execution-grid" class="execution-grid"></div>
+
+      <div class="lp-final-cta">
+        <h3>下一步：把这套页面直接接到你的线上域名</h3>
+        <p>当前内容已与项目绑定，可继续接入真实截图、在线 Demo 与用户证言。</p>
+        <a class="btn btn-primary" href="https://github.com/Charlo-O/uiux" target="_blank" rel="noopener noreferrer">进入仓库继续迭代</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="lp-footer">
+    <div class="lp-footer-inner">
+      <p>© AionUI · Built from real projects, not isolated demos.</p>
+      <div class="lp-footer-links">
+        <a href="uiuxpro_styles.html" target="_blank">风格库</a>
+        <a href="uiuxpro_colors.html" target="_blank">配色库</a>
+        <a href="uiuxpro_icons.html" target="_blank">图标库</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/pinned-projects-data.js"></script>
+  <script src="js/style-project-map.js"></script>
+  <script src="js/style-data.js"></script>
+  <script src="js/real-landing.js"></script>
 </body>
 </html>
